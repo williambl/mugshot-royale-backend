@@ -1,4 +1,5 @@
 import typing
+from json import JSONEncoder
 
 class Player:
 
@@ -6,3 +7,9 @@ class Player:
         self.name = name
         self.addr = addr
         self.isAlive = True
+
+class PlayerEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Player):
+            return [obj.name, obj.addr, obj.isAlive]
+        return json.JSONEncoder.default(self, obj)

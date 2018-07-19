@@ -1,5 +1,6 @@
 from flask import Flask, request, send_from_directory, make_response, redirect
-from player import Player
+from player import *
+import json
 
 app = Flask(__name__, static_url_path='')
 players = []
@@ -34,3 +35,7 @@ def upload():
     with open(request.args.get("player")+".jpg", "wb") as f:
         f.write(request.data)
     return request.args.get("player")
+
+@app.route("/players")
+def send_player_list():
+    return json.dumps(players, cls=PlayerEncoder)
