@@ -10,7 +10,7 @@ def login():
     if request.method == "GET":
         return send_from_directory("game", "login.html")
     elif request.method == "POST":
-        players.append(Player(request.form.get("name"), request.remote_addr))
+        players.append(Player(request.form["name"], request.remote_addr))
         response = redirect("/")
         response.set_cookie("id", str(len(players)-1))
         return response
