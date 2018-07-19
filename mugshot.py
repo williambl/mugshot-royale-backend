@@ -1,4 +1,4 @@
-from flask import Flask, request, send_from_directory, make_response
+from flask import Flask, request, send_from_directory, make_response, redirect
 from player import Player
 
 app = Flask(__name__, static_url_path='')
@@ -10,9 +10,15 @@ def login():
         return send_from_directory("game", "login.html")
     elif request.method == "POST":
         players.append(Player(request.form.get("name"), request.remote_addr))
-        response = make_response("done!")
+        response = redirect("/")
         response.set_cookie("id", str(len(players)-1))
         return response
+
+@app.route("/")
+def send_root():
+    if request.cookies.get("id") == None:
+        return redirect("login")
+    return redirect("/game/index.html")
 
 @app.route("/game/<path:path>")
 def send_page(path):
