@@ -22,10 +22,14 @@ def send_root():
 
 @app.route("/game/<path:path>")
 def send_page(path):
+    if request.cookies.get("id") == None:
+        return "403 Unauthorised", 403
     return send_from_directory("game", path)
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    if request.cookies.get("id") == None:
+        return "403 Unauthorised", 403
     print(request.args.get("player"))
     with open(request.args.get("player")+".jpg", "wb") as f:
         f.write(request.data)
