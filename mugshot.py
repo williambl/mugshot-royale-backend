@@ -4,6 +4,7 @@ from flask_socketio import SocketIO, emit
 from player import *
 
 app = Flask(__name__, static_url_path='')
+app.config['SECRET_KEY'] = "secret_key"
 socketio = SocketIO(app)
 players = []
 
@@ -13,7 +14,7 @@ def login():
         return send_from_directory("game", "login.html")
     elif request.method == "POST":
         players.append(Player(request.form["name"], request.remote_addr))
-        socketio.emit("player-joined", {"name": request.form["name"]})
+        socketio.emit("player-joined", {"name": request.form["name"]}, namespace="/websocket", broadcast=True)
         response = redirect("/")
         response.set_cookie("id", str(len(players)-1))
         return response
@@ -40,8 +41,8 @@ def upload():
 
     for player in players:
         if player.name == request.args.get("player"):
-            socketio.emit("player-eliminated", {"name": player.name})
             player.isAlive = False
+            socketio.emit("player-eliminated", {"name": player.name}, namespace="/websocket", broadcast=True)
 
     return request.args.get("player")
 
