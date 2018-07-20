@@ -56,7 +56,13 @@ def websocket_connect():
 
 @socketio.on('disconnect', namespace='/websocket')
 def websocket_disconnect():
-    print('Client disconnected')
+    name = ""
+    for player in players:
+        if player.addr == request.remote_addr:
+            name = player.name
+            players.remove(player)
+    print(name + ' disconnected')
+    emit("player-left", {"name": name}, broadcast=True)
 
 if __name__ == "__main__":
     socketio.run(app)
