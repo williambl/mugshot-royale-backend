@@ -34,6 +34,11 @@ def upload():
     print(request.args.get("player"))
     with open(request.args.get("player")+".jpg", "wb") as f:
         f.write(request.data)
+
+    for player in players:
+        if player.name == request.args.get("player"):
+            player.isAlive = False
+
     return request.args.get("player")
 
 @app.route("/players")
