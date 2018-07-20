@@ -11,5 +11,5 @@ class Player:
 class PlayerEncoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Player):
-            return [obj.name, obj.addr, obj.isAlive]
+            return {"name": obj.name, "addr": obj.addr, "isAlive": obj.isAlive}
         return json.JSONEncoder.default(self, obj)
