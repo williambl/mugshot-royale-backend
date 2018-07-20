@@ -64,5 +64,11 @@ def websocket_disconnect():
     print(name + ' disconnected')
     emit("player-left", {"name": name}, broadcast=True)
 
+async def start_game(lat, long, rad, freq):
+    for i in range(1, 3):
+        await asyncio.sleep(freq/i)
+        rad = rad/i+1
+        print("radius: " rad + ", shrink frequency: "+ freq)
+
 if __name__ == "__main__":
     socketio.run(app, host="0.0.0.0")
