@@ -3,6 +3,7 @@ import json
 from flask_socketio import SocketIO, emit
 from player import *
 import os
+import asyncio
 
 app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = "secret_key"
@@ -78,7 +79,7 @@ def handle_start_game_request(data):
     emit("start-game", {"rad": data["rad"], "lat": data["lat"], "long": data["long"], "time": data["time"]}, broadcast=True)
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(lat, long, radius, time)
+    result = loop.run_until_complete(start_game(float(data["lat"]), float(data["long"]), float(data["rad"]), float(data["time"])))
 
 def parse_config():
     try:
@@ -97,7 +98,7 @@ async def start_game(lat, long, rad, freq):
     for i in range(1, 3):
         await asyncio.sleep(freq/i)
         rad = rad/i+1
-        print("radius: " + rad + ", shrink frequency: "+ freq)
+        print("radius: " + str(rad) + ", shrink frequency: "+ str(freq))
 
 if __name__ == "__main__":
     parse_config()
