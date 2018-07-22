@@ -66,7 +66,7 @@ def websocket_disconnect():
     print(name + ' disconnected')
     emit("player-left", {"name": name}, broadcast=True)
 
-@socketio.on("start-game-request")
+@socketio.on("start-game-request", namespace="/websocket")
 def handle_start_game_request(json):
     print("received start-game-request")
     admin = None
@@ -74,7 +74,8 @@ def handle_start_game_request(json):
         if player.addr == request.remote_addr and player.isAdmin:
             admin = player
     print(admin.name + "has started the game!");
-    emit("start-game", {"radius": data.radius, "lat": data.lat, "long": data.long, "time": data.time}, broadcast=True)
+    print(json)
+    emit("start-game", {"rad": data["rad"], "lat": data["lat"], "long": data["long"], "time": data["time"]}, broadcast=True)
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     result = loop.run_until_complete(lat, long, radius, time)
