@@ -67,7 +67,7 @@ def websocket_disconnect():
     emit("player-left", {"name": name}, broadcast=True)
 
 @socketio.on("start-game-request", namespace="/websocket")
-def handle_start_game_request(json):
+def handle_start_game_request(data):
     print("received start-game-request")
     admin = None
     for player in players:
