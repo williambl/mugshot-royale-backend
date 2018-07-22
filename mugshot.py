@@ -95,9 +95,9 @@ def parse_config():
 
 
 async def start_game(lat, long, rad, freq):
-    for i in range(1, 3):
+    for i in range(1, 5):
         await asyncio.sleep(freq/i)
-        rad = rad/i+1
+        rad = rad/(i+1)
         print("radius: " + str(rad) + ", shrink frequency: "+ str(freq))
 
 if __name__ == "__main__":
