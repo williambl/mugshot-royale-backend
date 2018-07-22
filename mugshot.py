@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = "secret_key"
-socketio = SocketIO(app)
+socketio = SocketIO(app, engineio_logger=True)
 players = []
 config = {}
 
