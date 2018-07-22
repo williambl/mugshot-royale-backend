@@ -2,11 +2,13 @@ from flask import Flask, request, send_from_directory, make_response, redirect
 import json
 from flask_socketio import SocketIO, emit
 from player import *
+import os
 
 app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = "secret_key"
 socketio = SocketIO(app)
 players = []
+config = {}
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -76,6 +78,19 @@ def handle_start_game_request(radius, lat, long, time):
     asyncio.set_event_loop(loop)
     result = loop.run_until_complete(lat, long, radius, time)
 
+def parse_config():
+    try:
+        with open(os.path.join(os.path.expanduser("~/.config/mugshot-royale"),"config.json"), 'r') as config_file:
+            global config
+            config = json.loads(config_file.read())
+    except IOError:
+        try:
+            os.makedirs(os.path.expanduser("~/.config/mugshot-royale"))
+        except IOError:
+            pass
+        open(os.path.join(os.path.expanduser("~/.config/mugshot-royale"),"config.json"), 'a').close()
+
+
 async def start_game(lat, long, rad, freq):
     for i in range(1, 3):
         await asyncio.sleep(freq/i)
@@ -83,4 +98,5 @@ async def start_game(lat, long, rad, freq):
         print("radius: " + rad + ", shrink frequency: "+ freq)
 
 if __name__ == "__main__":
+    parse_config()
     socketio.run(app, host="0.0.0.0")
