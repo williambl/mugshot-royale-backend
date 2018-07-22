@@ -96,8 +96,13 @@ def parse_config():
 
 async def start_game(lat, long, rad, freq):
     for i in range(1, 5):
-        await asyncio.sleep(freq/i)
-        rad = rad/(i+1)
+        wait_time = freq/i
+        new_radius = rad/(i+1)
+
+        socketio.emit("safe-zone-will-shrink", {"rad": new_radius, "lat": lat, "long": long, "time": wait_time}, namespace="/websocket", broadcast=True)
+
+        await asyncio.sleep(wait_time)
+        rad = new_radius
         print("radius: " + str(rad) + ", shrink frequency: "+ str(freq))
 
 if __name__ == "__main__":
