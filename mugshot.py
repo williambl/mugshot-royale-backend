@@ -5,12 +5,14 @@ from player import *
 import os
 import asyncio
 from haversine import haversine
+from game import *
 
 app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = "secret_key"
 socketio = SocketIO(app, engineio_logger=True)
 players = []
 config = {}
+game = None
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
@@ -100,16 +102,11 @@ def parse_config():
 
 
 async def start_game(lat, long, rad, freq):
+    global game
+    game = Game(lat, long, rad, freq, socketio)
     check_player_positions(10)
     for i in range(1, 5):
-        wait_time = freq/i
-        new_radius = rad/(i+1)
-
-        socketio.emit("safe-zone-will-shrink", {"rad": new_radius, "lat": lat, "long": long, "time": wait_time}, namespace="/websocket", broadcast=True)
-
-        await asyncio.sleep(wait_time)
-        rad = new_radius
-        print("radius: " + str(rad) + ", shrink frequency: "+ str(freq))
+        game.shrink_safe_zone()
 
 async def check_player_positions(freq):
     while True:
