@@ -86,7 +86,10 @@ def handle_start_game_request(data):
 
 @socketio.on("position", namespace="/websocket")
 def check_position(data):
-
+    if haversine((data["lat"], data["long"]), (game.lat, game.long)) > game.rad:
+        for player in players:
+            if player.addr == request.remote_addr:
+                player.hp -= 1;
 
 def parse_config():
     try:

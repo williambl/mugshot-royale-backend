@@ -9,6 +9,7 @@ class Player:
         self.isAlive = True
         self.isAdmin = isAdmin
         self.team = team
+        self.hp = 6
 
 class PlayerEncoder(JSONEncoder):
     def default(self, obj):
