@@ -4,6 +4,7 @@ from flask_socketio import SocketIO, emit
 from player import *
 import os
 import asyncio
+from haversine import haversine
 
 app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = "secret_key"
@@ -81,6 +82,10 @@ def handle_start_game_request(data):
     asyncio.set_event_loop(loop)
     result = loop.run_until_complete(start_game(float(data["lat"]), float(data["long"]), float(data["rad"]), float(data["time"])))
 
+@socketio.on("position", namespace="/websocket")
+def check_position(data):
+
+
 def parse_config():
     try:
         with open(os.path.join(os.path.expanduser("~/.config/mugshot-royale"),"config.json"), 'r') as config_file:
@@ -95,6 +100,7 @@ def parse_config():
 
 
 async def start_game(lat, long, rad, freq):
+    check_player_positions(10)
     for i in range(1, 5):
         wait_time = freq/i
         new_radius = rad/(i+1)
@@ -104,6 +110,11 @@ async def start_game(lat, long, rad, freq):
         await asyncio.sleep(wait_time)
         rad = new_radius
         print("radius: " + str(rad) + ", shrink frequency: "+ str(freq))
+
+async def check_player_positions(freq):
+    while True:
+        await asyncio.sleep(freq)
+        socketio.emit("send-position", namespace="/websocket", broadcast=True)
 
 if __name__ == "__main__":
     parse_config()
