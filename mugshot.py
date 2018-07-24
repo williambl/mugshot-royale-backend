@@ -107,13 +107,14 @@ def parse_config():
 async def start_game(lat, long, rad, freq):
     global game
     game = Game(lat, long, rad, freq, socketio)
-    check_player_positions(10)
+    await check_player_positions(10)
     for i in range(1, 5):
-        game.shrink_safe_zone()
+        await game.shrink_safe_zone()
 
 async def check_player_positions(freq):
     while True:
         await asyncio.sleep(freq)
+        print("checking!")
         socketio.emit("send-position", namespace="/websocket", broadcast=True)
 
 if __name__ == "__main__":

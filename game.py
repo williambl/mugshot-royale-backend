@@ -1,3 +1,5 @@
+import asyncio
+
 class Game:
 
     def __init__(self, lat, long, rad, freq, socketio):
@@ -7,7 +9,7 @@ class Game:
         self.freq = freq
         self.socketio = socketio
 
-    def shrink_safe_zone():
+    async def shrink_safe_zone():
         wait_time = freq/i
         new_radius = rad/(i+1)
 
