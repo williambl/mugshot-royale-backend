@@ -86,10 +86,12 @@ def handle_start_game_request(data):
 
 @socketio.on("position", namespace="/websocket")
 def check_position(data):
+    print("Received position!")
     if haversine((data["lat"], data["long"]), (game.lat, game.long)) > game.rad:
         for player in players:
             if player.addr == request.remote_addr:
                 player.hp -= 1;
+                print(player.name + " is outside the safe zone! Their hp is now " + player.hp)
 
 def parse_config():
     try:
