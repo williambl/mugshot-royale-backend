@@ -19,27 +19,29 @@ def login():
     if request.method == "GET":
         return send_from_directory("game", "login.html")
     elif request.method == "POST":
-        players.append(Player(request.form["name"], request.remote_addr, request.form["name"] in config["admins"], ""))
+        new_id = request.form["name"] + str(len(players))
+        new_player = Player(request.form["name"], request.remote_addr, request.form["name"] in config["admins"], "", new_id)
+        players.append(new_player)
         socketio.emit("player-joined", {"name": request.form["name"]}, namespace="/websocket", broadcast=True)
         response = redirect("/")
-        response.set_cookie("id", str(len(players)-1))
+        response.set_cookie("id", new_id)
         return response
 
 @app.route("/")
 def send_root():
-    if request.cookies.get("id") == None:
+    if not is_valid_id(request.cookies.get("id")):
         return redirect("login")
     return redirect("/game/index.html")
 
 @app.route("/game/<path:path>")
 def send_page(path):
-    if request.cookies.get("id") == None:
+    if not is_valid_id(request.cookies.get("id")):
         return "403 Unauthorised", 403
     return send_from_directory("game", path)
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    if request.cookies.get("id") == None:
+    if not is_valid_id(request.cookies.get("id")):
         return "403 Unauthorised", 403
     print(request.args.get("player"))
     with open(request.args.get("player")+".jpg", "wb") as f:
@@ -48,7 +50,7 @@ def upload():
     for player in players:
         if player.name == request.args.get("player"):
             player.isAlive = False
-            socketio.emit("player-eliminated", {"name": player.name}, namespace="/websocket", broadcast=True)
+            socketio.emit("player-eliminated", {"name": player.name, "id": player.id}, namespace="/websocket", broadcast=True)
 
     return request.args.get("player")
 
@@ -104,6 +106,12 @@ def parse_config():
         except IOError:
             pass
         open(os.path.join(os.path.expanduser("~/.config/mugshot-royale"),"config.json"), 'a').close()
+
+def is_valid_id(id_to_check):
+    for player in players:
+        if (player.id == id_to_check):
+            return True
+    return False
 
 
 async def start_game(lat, long, rad, freq):
