@@ -19,6 +19,8 @@ def login():
     if request.method == "GET":
         return send_from_directory("game", "login.html")
     elif request.method == "POST":
+        if (not config["unique_names_allowed"] and is_unique_name(request.form["name"])):
+            return redirect("login")
         new_id = request.form["name"] + str(len(players))
         new_player = Player(request.form["name"], request.remote_addr, request.form["name"] in config["admins"], "", new_id)
         players.append(new_player)
@@ -112,6 +114,12 @@ def is_valid_id(id_to_check):
         if (player.id == id_to_check):
             return True
     return False
+
+def is_unique_name(name_to_check):
+    for player in players:
+        if (player.name == name_to_check):
+            return False
+    return True
 
 
 async def start_game(lat, long, rad, freq):
